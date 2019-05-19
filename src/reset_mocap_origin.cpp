@@ -49,11 +49,6 @@ void ResetMocapOrigin::GetMocapTF(void)
 			q_ini_position = q_raw_position;
 			q_ini_orientation = q_raw_orientation;
 			inipose_is_available = true;
-
-			double ini_rpy[3];
-			tf::Matrix3x3(q_ini_orientation).getRPY(ini_rpy[0], ini_rpy[1], ini_rpy[2]);
-			std::cout << "ini xyz[m]:(" << q_ini_position.x() << ", " << q_ini_position.y() << ", " << q_ini_position.z() << ")" << std::endl;
-			std::cout << "ini rpy[deg]:(" << ini_rpy[0]/M_PI*180.0 << ", " << ini_rpy[1]/M_PI*180.0 << ", " << ini_rpy[2]/M_PI*180.0 << ")" << std::endl;
 		}
 		else{
 			q_relative_position = tf::Quaternion(
@@ -93,7 +88,6 @@ int main(int argc, char** argv)
 
 	ros::Rate loop_rate(10);
 	while(ros::ok()){
-		std::cout << "========================" << std::endl;
 		reset_mocap_origin.GetMocapTF();
 		ros::spinOnce();
 		loop_rate.sleep();
