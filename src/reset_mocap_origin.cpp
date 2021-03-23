@@ -6,6 +6,7 @@ class ResetMocapOrigin{
 	private:
 		/*node handle*/
 		ros::NodeHandle nh;
+		ros::NodeHandle _nhPrivate;
 		/*listener*/
 		tf::TransformListener listener;
 		/*publisher*/
@@ -21,6 +22,8 @@ class ResetMocapOrigin{
 		ros::Time time_pub;
 		/*flags*/
 		bool inipose_is_available = false;
+		/*parameter*/
+		std::string _frame_id_gt;
 	public:
 		ResetMocapOrigin();
 		void GetMocapTF(void);
@@ -28,7 +31,13 @@ class ResetMocapOrigin{
 };
 
 ResetMocapOrigin::ResetMocapOrigin()
+	: _nhPrivate("~")
 {
+	std::cout << "--- reset_mocap_origin ---" << std::endl;
+	/*parameter*/
+	_nhPrivate.param("frame_id_gt", _frame_id_gt, std::string("/vicon/sensors/sensors"));
+	std::cout << "_frame_id_gt = " << _frame_id_gt << std::endl;
+	/*publisher*/
 	pub_pose = nh.advertise<geometry_msgs::PoseStamped>("/pose_mocap", 1);
 }
 
@@ -37,7 +46,7 @@ void ResetMocapOrigin::GetMocapTF(void)
 	try{
 		tf::StampedTransform transform;
 		// listener.lookupTransform("/vicon/infant/infant", "/world", ros::Time(0), transform);
-		listener.lookupTransform("/world", "/vicon/infant/infant", ros::Time(0), transform);
+		listener.lookupTransform("/world", _frame_id_gt, ros::Time(0), transform);
 		time_pub = ros::Time(0);
 		q_raw_position = tf::Quaternion(
 			transform.getOrigin().x(),
